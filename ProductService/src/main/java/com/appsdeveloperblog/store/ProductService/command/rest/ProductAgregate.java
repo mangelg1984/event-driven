@@ -40,6 +40,7 @@ public class ProductAgregate {
         LOGGER.info("--------- before apply: ");
         AggregateLifecycle.apply(productCreatedEvent);
         LOGGER.info("--------- after apply: ");
+
     }
 
     @EventSourcingHandler

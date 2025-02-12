@@ -6,10 +6,12 @@ import com.appsdeveloperblog.store.ProductService.core.data.ProductRepository;
 import com.appsdeveloperblog.store.ProductService.core.event.ProductCreatedEvent;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
+import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
+
 
 @Component
 @ProcessingGroup("product-group")
@@ -18,14 +20,31 @@ public class ProductEventHandler {
 
     private final ProductRepository productRepository;
 
-    public ProductEventHandler(ProductRepository productRepository){
+    public ProductEventHandler(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
+
+    @ExceptionHandler(resultType = IllegalArgumentException.class)
+    public void handle(IllegalArgumentException exception) {
+    }
+
+    @ExceptionHandler(resultType = Exception.class)
+    public void handle(Exception exception) throws Exception {
+        LOGGER.info("######### trowing exception... ");
+        throw exception;
+    }
+
     @EventHandler
-    public void on(ProductCreatedEvent event){
+    public void on(ProductCreatedEvent event) throws Exception {
         ProductEntity productEntity = new ProductEntity();
         BeanUtils.copyProperties(event, productEntity);
-        LOGGER.info("######### saving: " + productEntity);
-        productRepository.save(productEntity);
+        try {
+            LOGGER.info("######### saving: " + productEntity);
+            productRepository.save(productEntity);
+        } catch (IllegalArgumentException exception) {
+            exception.printStackTrace();
+        }
+
+        if (true) throw new Exception("Forcing exception in the Event Handler Class");
     }
 }
