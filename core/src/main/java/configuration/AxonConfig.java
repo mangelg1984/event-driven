@@ -10,7 +10,6 @@ public class AxonConfig {
     @Bean
     public XStream xStream() {
         XStream xStream = new XStream();
-
         xStream.allowTypesByWildcard(new String[] {
                 "com.appsdeveloperblog.**"
         });
