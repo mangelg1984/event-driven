@@ -2,8 +2,6 @@ package com.appsdeveloperblog.store.ProductService.command.rest;
 
 import com.appsdeveloperblog.store.ProductService.command.CreateProductCommand;
 import com.appsdeveloperblog.store.ProductService.core.event.ProductCreatedEvent;
-import com.appsdeveloperblog.store.core.ReserveProductCommand;
-import com.appsdeveloperblog.store.core.events.ProductReservedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -43,25 +41,6 @@ public class ProductAgregate {
         AggregateLifecycle.apply(productCreatedEvent);
         LOGGER.info("--------- after apply: ");
 
-    }
-    @CommandHandler
-    public void handle(ReserveProductCommand reserveProductCommand){
-        if(quantity < reserveProductCommand.getQuantity()){
-            throw new IllegalArgumentException("Insufficient number of items in stock");
-        }
-
-        ProductReservedEvent productReservedEvent = ProductReservedEvent.builder()
-                .orderId(reserveProductCommand.getOrderId())
-                .productId(reserveProductCommand.getProductId())
-                .quantity(reserveProductCommand.getQuantity())
-                .userId(reserveProductCommand.getUserId())
-                .build();
-
-        AggregateLifecycle.apply(productReservedEvent);
-    }
-    @EventSourcingHandler
-    public void on(ProductReservedEvent productReservedEvent){
-        this.quantity -= productReservedEvent.getQuantity();
     }
 
     @EventSourcingHandler
