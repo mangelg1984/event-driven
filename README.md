@@ -19,10 +19,19 @@ Pasos para ejecutar el proyecto
     
     mvn spring-boot:run
 
-7.- Iniciar el microservicio de ApiGateway con el siguiente comando:
+
+7.- Iniciar el microservicio de ProductService con el siguiente comando:
 
     mvn spring-boot:run
 
-8.- Iniciar el microservicio de ProductService con el siguiente comando:
+8.- Iniciar el microservicio de OrderService con el siguiente comando:
+    mvn spring-boot:run
+
+9.- Iniciar el microservicio de UserService con el siguiente comando:
+  
+    mvn spring-boot:run
+
+10.- Iniciar el microservicio de ApiGateway con el siguiente comando:
 
     mvn spring-boot:run
+
