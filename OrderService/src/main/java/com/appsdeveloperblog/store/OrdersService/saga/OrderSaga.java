@@ -1,7 +1,11 @@
 package com.appsdeveloperblog.store.OrdersService.saga;
 
+import com.appsdeveloperblog.store.OrdersService.command.commands.ApproveOrderCommand;
+import com.appsdeveloperblog.store.OrdersService.core.events.OrderApprovedEvent;
 import com.appsdeveloperblog.store.OrdersService.core.events.OrderCreatedEvent;
+import com.appsdeveloperblog.store.core.commands.ProcessPaymentCommand;
 import com.appsdeveloperblog.store.core.commands.ReserveProductCommand;
+import com.appsdeveloperblog.store.core.events.PaymentProcessedEvent;
 import com.appsdeveloperblog.store.core.events.ProductReservedEvent;
 import com.appsdeveloperblog.store.core.model.User;
 import com.appsdeveloperblog.store.core.query.FetchUserPaymentDetailsQuery;
@@ -10,7 +14,9 @@ import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.CommandResultMessage;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
+import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
+import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.spring.stereotype.Saga;
@@ -19,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Saga
 public class OrderSaga {
@@ -76,5 +84,37 @@ public class OrderSaga {
             return ;
         }
         LOGGER.info("Successfully fetched user payment details for user " + userPaymentDetails.getFirstName());
+        ProcessPaymentCommand processPaymentCommand = ProcessPaymentCommand.builder()
+                .orderId(productReservedEvent.getOrderId())
+                .paymentDetails(userPaymentDetails.getPaymentDetails())
+                .paymentId(UUID.randomUUID().toString())
+                .build();
+
+        String result = null;
+
+        try {
+            result = commandGateway.sendAndWait(processPaymentCommand,10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
+
+        if(result == null){
+            LOGGER.info("The ProcessPaymentCommand resulted null. Initiating a compensating transaction");
+            // Start compensating transaction
+        }
+    }
+    @SagaEventHandler(associationProperty = "orderId")
+    public void handle(PaymentProcessedEvent paymentProcessedEvent){
+        // Send an ApprovedOrderCommand
+        ApproveOrderCommand approveOrderCommand =
+                new ApproveOrderCommand(paymentProcessedEvent.getOrderId());
+        commandGateway.send(approveOrderCommand);
+    }
+
+    @EndSaga
+    @SagaEventHandler(associationProperty = "orderId")
+    public void handle(OrderApprovedEvent orderApprovedEvent){
+         LOGGER.info("Order is approved. Order Saga is complete for orderId: " + orderApprovedEvent.getOrderId());
+        //SagaLifecycle.end();
     }
 }

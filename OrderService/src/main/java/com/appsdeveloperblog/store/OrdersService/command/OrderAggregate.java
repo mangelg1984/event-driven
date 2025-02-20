@@ -5,6 +5,8 @@
  */
 package com.appsdeveloperblog.store.OrdersService.command;
 
+import com.appsdeveloperblog.store.OrdersService.command.commands.ApproveOrderCommand;
+import com.appsdeveloperblog.store.OrdersService.core.events.OrderApprovedEvent;
 import com.appsdeveloperblog.store.OrdersService.core.events.OrderCreatedEvent;
 import com.appsdeveloperblog.store.OrdersService.core.model.OrderStatus;
 import com.appsdeveloperblog.store.OrdersService.command.commands.CreateOrderCommand;
@@ -46,6 +48,16 @@ public class OrderAggregate {
         this.quantity = orderCreatedEvent.getQuantity();
         this.orderStatus = orderCreatedEvent.getOrderStatus();
     }
- 
 
+    @CommandHandler
+    public void handle(ApproveOrderCommand approveOrderCommand){
+        // Create and Publish the OrderApprovedEvent
+        OrderApprovedEvent orderApprovedEvent = new OrderApprovedEvent(approveOrderCommand.getOrderId());
+        AggregateLifecycle.apply(orderApprovedEvent);
+    }
+ 
+    @EventSourcingHandler
+    public void on(OrderApprovedEvent orderApprovedEvent) throws Exception {
+        this.orderStatus = orderApprovedEvent.getOrderStatus();
+    }
 }
