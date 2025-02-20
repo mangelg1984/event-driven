@@ -1,9 +1,10 @@
 package com.appsdeveloperblog.store.ProductService.query;
 
-import com.appsdeveloperblog.store.ProductService.command.interceptors.CreateProductCommandInterceptor;
+
 import com.appsdeveloperblog.store.ProductService.core.data.ProductEntity;
 import com.appsdeveloperblog.store.ProductService.core.data.ProductRepository;
 import com.appsdeveloperblog.store.ProductService.core.event.ProductCreatedEvent;
+import com.appsdeveloperblog.store.core.events.ProductReservedEvent;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.messaging.interceptors.ExceptionHandler;
@@ -44,7 +45,13 @@ public class ProductEventHandler {
         } catch (IllegalArgumentException exception) {
             exception.printStackTrace();
         }
-
-        if (true) throw new Exception("Forcing exception in the Event Handler Class");
     }
+
+    @EventHandler
+    public void on(ProductReservedEvent event) throws Exception {
+        ProductEntity productEntity = productRepository.findByProductId(event.getProductId());
+        productEntity.setQuantity(productEntity.getQuantity() - event.getQuantity());
+        productRepository.save(productEntity);
+    }
+
 }
