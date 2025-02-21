@@ -4,6 +4,7 @@ package com.appsdeveloperblog.store.ProductService.query;
 import com.appsdeveloperblog.store.ProductService.core.data.ProductEntity;
 import com.appsdeveloperblog.store.ProductService.core.data.ProductRepository;
 import com.appsdeveloperblog.store.ProductService.core.event.ProductCreatedEvent;
+import com.appsdeveloperblog.store.core.events.ProductReservationCancelledEvent;
 import com.appsdeveloperblog.store.core.events.ProductReservedEvent;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
@@ -53,5 +54,11 @@ public class ProductEventHandler {
         productEntity.setQuantity(productEntity.getQuantity() - event.getQuantity());
         productRepository.save(productEntity);
     }
-
+    @EventHandler
+    public void on(ProductReservationCancelledEvent event) throws Exception {
+        ProductEntity productEntity = productRepository.findByProductId(event.getProductId());
+        int newQuantity = productEntity.getQuantity() + event.getQuantity();
+        productEntity.setQuantity(newQuantity);
+        productRepository.save(productEntity);
+    }
 }
