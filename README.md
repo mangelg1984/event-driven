@@ -10,29 +10,32 @@ Pasos para ejecutar el proyecto
 4.- Dentro del directorio **AxonServer-2024.2.2/config/** colocar el archivo axonserver.properties 
     que se encuentra en la carpeta config en la raiz de este repositorio
     
-5.- Ejecutar el siguiente comando dentro del directorio AxonServer-2024.2.2 sobre una terminal 
+5.- Ejecutar el siguiente comando dentro del directorio AxonServer-2024.2.2 sobre la consola 
 
     java -jar axonserver.jar
     
 6.- Una vez se este ejecutando Axon Server, ahora iniciar el microservicio de DiscoveryServer con el 
-    siguiente comando:
+    siguiente comando desde la consola estando dentro de la carpeta donde se encuentra el pom.xml:
     
     mvn spring-boot:run
 
-
-7.- Iniciar el microservicio de ProductService con el siguiente comando:
-
-    mvn spring-boot:run
-
-8.- Iniciar el microservicio de OrderService con el siguiente comando:
+7.- Iniciar el microservicio de ProductService con el siguiente comando desde la consola estando dentro de la carpeta donde se encuentra el pom.xml:
 
     mvn spring-boot:run
 
-9.- Iniciar el microservicio de UserService con el siguiente comando:
+8.- Iniciar el microservicio de OrderService con el siguiente comando desde la consola estando dentro de la carpeta donde se encuentra el pom.xml:
+
+    mvn spring-boot:run
+
+9.- Iniciar el microservicio de PaymentsServices con el siguiente comando desde la consola estando dentro de la carpeta donde se encuentra el pom.xml:
+
+    mvn spring-boot:run
+
+10.- Iniciar el microservicio de UserService con el siguiente comando desde la consola estando dentro de la carpeta donde se encuentra el pom.xml:
   
     mvn spring-boot:run
 
-10.- Iniciar el microservicio de ApiGateway con el siguiente comando:
+11.- Iniciar el microservicio de ApiGateway con el siguiente comando desde la consola estando dentro de la carpeta donde se encuentra el pom.xml:
 
     mvn spring-boot:run
 
